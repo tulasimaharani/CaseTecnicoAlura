@@ -1,0 +1,32 @@
+# Security
+*.properties
+
+# Eclipse files
+.project
+.classpath
+*.settings
+
+# Build files
+target/
+META-INF/
+
+# Maven files
+*.mvn
+mvnw
+mvnw.*
+
+# Compiled class file
+*.class
+
+# Log file
+*.log
+
+# Package Files #
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
