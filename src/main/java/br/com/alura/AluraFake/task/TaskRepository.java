@@ -8,6 +8,6 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
 
 	boolean existsByType(Type type);
 
-	List<Task> findAllByCourseId(Long long1);
+	List<Task> findAllByCourseId(Long id);
 
 }
