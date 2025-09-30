@@ -58,14 +58,47 @@ public class TaskController {
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 
-    @PostMapping("/task/new/singlechoice")
-    public ResponseEntity newSingleChoice() {
-        return ResponseEntity.ok().build();
-    }
 
     @PostMapping("/task/new/multiplechoice")
     public ResponseEntity newMultipleChoice() {
         return ResponseEntity.ok().build();
     }
+	@PostMapping("/task/new/singlechoice")
+	public ResponseEntity newSingleChoice(@Valid @RequestBody NewTaskWithOptionsDTO newTaskWithOptionsDTO) {
+		newTaskWithOptionsDTO.setType(Type.SINGLE_CHOICE);
+
+		if (newTaskWithOptionsDTO.getOptions().isEmpty()) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(new ErrorItemDTO("option", "A atividade deve ter no minimo 2 e no máximo 5 alternativas"));
+		}
+		try {
+			taskService.checkNumberOfOptionsSingleChoice(newTaskWithOptionsDTO);
+			taskService.checkNumberOfCorrectAnswersSingleChoice(newTaskWithOptionsDTO);
+			taskService.checkTaskStatementDiffersFromOption(newTaskWithOptionsDTO);
+
+			Optional<Course> course = courseRepository.findById(newTaskWithOptionsDTO.getCourseId());
+			if (course.isEmpty()) {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+						.body(new ErrorItemDTO("courseId", "Curso inválido"));
+			}
+			taskService.checkCourseStatus(course);
+
+			Task task = taskRepository.save(newTaskWithOptionsDTO.toModel(course.get()));
+
+			List<Option> optionsToSave = new ArrayList<Option>();
+			for (NewOptionDTO optionDTO : newTaskWithOptionsDTO.getOptions()) {
+				optionsToSave.add(new Option(optionDTO.getOption(), optionDTO.isCorrect(), task));
+			}
+
+			optionRepository.saveAll(optionsToSave);
+		} catch (DataIntegrityViolationException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+					new ErrorItemDTO("option", "O curso ou tarefa não pode ter duas questões com o mesmo enunciado"));
+		} catch (ErrorItem e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorItemDTO(e.getField(), e.getMessage()));
+		}
+
+		return ResponseEntity.status(HttpStatus.CREATED).build();
+	}
 
 }
