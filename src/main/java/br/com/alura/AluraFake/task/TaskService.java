@@ -1,7 +1,9 @@
 package br.com.alura.AluraFake.task;
 
+import java.util.List;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import br.com.alura.AluraFake.course.Course;
@@ -11,6 +13,14 @@ import br.com.alura.AluraFake.util.ErrorItem;
 @Service
 public class TaskService {
 
+	@Autowired
+	private TaskRepository taskRepository;
+	
+	@Autowired
+	public TaskService(TaskRepository taskRepository) {
+		this.taskRepository = taskRepository;
+	}
+	
 	public void checkCourseStatus(Optional<Course> course) throws ErrorItem {
 		if (!course.get().getStatus().equals(Status.BUILDING)) {
 			throw new ErrorItem("courseId", "Curso não está em construção");
@@ -67,6 +77,26 @@ public class TaskService {
 			if (option.getOption().equalsIgnoreCase(newTaskDTO.getStatement())) {
 				throw new ErrorItem("option", "As alternativas não podem ser iguais ao enunciado da atividade.");
 			}
+		}
+	}
+	
+	public void fixTaskOrder(Task taskToFix) throws ErrorItem {
+		List<Task> tasks = taskRepository.findAllByOrderByOrder();
+		if(tasks.isEmpty())
+			return;
+		int orderToMove = 0;
+		if (tasks.getLast().getOrder()+1 == taskToFix.getOrder()) {
+			return;
+		} 
+		if (tasks.getLast().getOrder()+1 < taskToFix.getOrder()) {
+			throw new ErrorItem("order", "A sequência de atividades está incorreta");
+		}
+		if (tasks.getLast().getOrder() >= taskToFix.getOrder()) {
+			orderToMove = taskToFix.getOrder();
+		}
+		for (int i = orderToMove; i <= tasks.size(); i++) {
+			tasks.get(i-1).setOrder(i+1);
+			taskRepository.save(tasks.get(i-1));
 		}
 	}
 

@@ -2,6 +2,8 @@ package br.com.alura.AluraFake.task;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.DynamicUpdate;
+
 import br.com.alura.AluraFake.course.Course;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,6 +15,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 
 @Entity
+@DynamicUpdate
 public class Task {
 
 	@Id
@@ -38,7 +41,7 @@ public class Task {
 		this.order = order;
 		this.type = type;
 	}
-
+	
 	public Course getCourse() {
 		return course;
 	}

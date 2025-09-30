@@ -46,8 +46,9 @@ public class TaskController {
 						.body(new ErrorItemDTO("courseId", "Curso inválido"));
 			}
 			taskService.checkCourseStatus(course);
-
-			taskRepository.save(newTaskDTO.toModel(course.get()));
+			Task task = newTaskDTO.toModel(course.get());
+			taskService.fixTaskOrder(task);
+			taskRepository.save(task);
 		} catch (DataIntegrityViolationException e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 					.body(new ErrorItemDTO("statement", "O curso não pode ter duas questões com o mesmo enunciado"));
@@ -77,8 +78,9 @@ public class TaskController {
 						.body(new ErrorItemDTO("courseId", "Curso inválido"));
 			}
 			taskService.checkCourseStatus(course);
-
-			Task task = taskRepository.save(newTaskWithOptionsDTO.toModel(course.get()));
+			Task task = newTaskWithOptionsDTO.toModel(course.get());
+			taskService.fixTaskOrder(task);
+			task = taskRepository.save(task);
 
 			List<Option> optionsToSave = new ArrayList<Option>();
 			for (NewOptionDTO optionDTO : newTaskWithOptionsDTO.getOptions()) {
@@ -115,9 +117,10 @@ public class TaskController {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 						.body(new ErrorItemDTO("courseId", "Curso inválido"));
 			}
-
-			Task task = taskRepository.save(newTaskWithOptionsDTO.toModel(course.get()));
 			taskService.checkCourseStatus(course);
+			Task task = newTaskWithOptionsDTO.toModel(course.get());
+			taskService.fixTaskOrder(task);
+			task = taskRepository.save(task);
 
 			List<Option> optionsToSave = new ArrayList<Option>();
 			for (NewOptionDTO optionDTO : newTaskWithOptionsDTO.getOptions()) {
