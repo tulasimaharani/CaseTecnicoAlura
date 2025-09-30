@@ -82,6 +82,9 @@ public class TaskService {
 	
 	public void fixTaskOrder(Task taskToFix) throws ErrorItem {
 		List<Task> tasks = taskRepository.findAllByOrderByOrder();
+		if(tasks.isEmpty() && taskToFix.getOrder() != 1) {
+			throw new ErrorItem("order", "A sequência de atividades deve começar em 1");
+		}
 		if(tasks.isEmpty())
 			return;
 		int orderToMove = 0;
