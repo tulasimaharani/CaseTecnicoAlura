@@ -7,5 +7,5 @@ CREATE TABLE Task (
     course_id bigint(20) NOT NULL,
     PRIMARY KEY (id),
     CONSTRAINT FK_Course FOREIGN KEY (course_id) REFERENCES Course(id) ON DELETE CASCADE,
-    CONSTRAINT UC_Statement UNIQUE (statement)
+    CONSTRAINT UC_Course_Task UNIQUE (statement, course_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
