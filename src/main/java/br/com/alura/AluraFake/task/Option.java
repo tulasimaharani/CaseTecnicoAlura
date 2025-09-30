@@ -16,6 +16,7 @@ public class Option {
 	private LocalDateTime createdAt = LocalDateTime.now();
 	private String option;
 	private Boolean isCorrect;
+	@ManyToOne
 	private Task task;
 	
 	public Option(String option, Boolean isCorrect, Task task) {

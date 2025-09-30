@@ -1,15 +1,16 @@
 package br.com.alura.AluraFake.task;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 
 import br.com.alura.AluraFake.course.Course;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 
 @Entity
 public class Task {
@@ -18,17 +19,24 @@ public class Task {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	private LocalDateTime createdAt = LocalDateTime.now();
+	private String statement;
+	@Column(name = "_order")
+	private Integer order;
+	@Enumerated(EnumType.STRING)
+	@Column(name = "_type")
+	private Type type;
 	@ManyToOne
 	private Course course;
-	private String statement;
-	private Integer order;
-	@OneToMany
-	private ArrayList<Option> options;
-	
-	public Task(Course course, String statement, Integer order) {
+
+	@Deprecated
+	public Task() {
+	}
+
+	public Task(Course course, String statement, Integer order, Type type) {
 		this.course = course;
 		this.statement = statement;
 		this.order = order;
+		this.type = type;
 	}
 
 	public Course getCourse() {
@@ -61,6 +69,14 @@ public class Task {
 
 	public LocalDateTime getCreatedAt() {
 		return createdAt;
+	}
+
+	public Type getType() {
+		return type;
+	}
+
+	public void setType(Type type) {
+		this.type = type;
 	}
 
 }
