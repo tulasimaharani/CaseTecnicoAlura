@@ -39,4 +39,35 @@ public class TaskService {
 		}
 	}
 
+	public void checkNumberOfOptionsMultipleChoice(NewTaskWithOptionsDTO newTaskDTO) throws ErrorItem {
+		int numberOfOptions = newTaskDTO.getOptions().size();
+		if (numberOfOptions < 3 || numberOfOptions > 5) {
+			throw new ErrorItem("option", "A atividade deve ter no minimo 3 e no máximo 5 alternativas");
+		}
+	}
+
+	public void checkNumberOfCorrectAndIncorrectAnswersMultipleChoice(NewTaskWithOptionsDTO newTaskDTO) throws ErrorItem {
+		int numberOfCorrectAnswers = 0;
+		int numberOfIncorrectAnswers = 0;
+		for (NewOptionDTO option : newTaskDTO.getOptions()) {
+			if (option.isCorrect()) {
+				numberOfCorrectAnswers++;
+			} else {
+				numberOfIncorrectAnswers++;
+			}
+		}
+		if (numberOfCorrectAnswers < 2 || numberOfIncorrectAnswers < 1) {
+			throw new ErrorItem("option",
+					"A atividade deve ter duas ou mais alternativas corretas, e ao menos uma alternativa incorreta.");
+		}
+	}
+
+	public void checkTaskStatementDiffersFromOption(NewTaskWithOptionsDTO newTaskDTO) throws ErrorItem {
+		for (NewOptionDTO option : newTaskDTO.getOptions()) {
+			if (option.getOption().equalsIgnoreCase(newTaskDTO.getStatement())) {
+				throw new ErrorItem("option", "As alternativas não podem ser iguais ao enunciado da atividade.");
+			}
+		}
+	}
+
 }
