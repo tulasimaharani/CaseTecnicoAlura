@@ -111,13 +111,13 @@ public class TaskController {
 			taskService.checkTaskStatementDiffersFromOption(newTaskWithOptionsDTO);
 
 			Optional<Course> course = courseRepository.findById(newTaskWithOptionsDTO.getCourseId());
-			taskService.checkCourseStatus(course);
 			if (course.isEmpty()) {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 						.body(new ErrorItemDTO("courseId", "Curso inválido"));
 			}
 
 			Task task = taskRepository.save(newTaskWithOptionsDTO.toModel(course.get()));
+			taskService.checkCourseStatus(course);
 
 			List<Option> optionsToSave = new ArrayList<Option>();
 			for (NewOptionDTO optionDTO : newTaskWithOptionsDTO.getOptions()) {
