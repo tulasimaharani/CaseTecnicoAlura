@@ -26,8 +26,8 @@ public class TaskService {
 		this.taskRepository = taskRepository;
 	}
 
-	public void checkCourseStatus(Optional<Course> course) throws ErrorItem {
-		if (!course.get().getStatus().equals(Status.BUILDING)) {
+	public void checkCourseStatus(Course course) throws ErrorItem {
+		if (!course.getStatus().equals(Status.BUILDING)) {
 			throw new ErrorItem("courseId", "Curso não está em construção");
 		}
 	}
