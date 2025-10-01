@@ -1,9 +1,14 @@
 package br.com.alura.AluraFake.task;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
 
 import br.com.alura.AluraFake.course.Course;
@@ -15,12 +20,12 @@ public class TaskService {
 
 	@Autowired
 	private TaskRepository taskRepository;
-	
+
 	@Autowired
 	public TaskService(TaskRepository taskRepository) {
 		this.taskRepository = taskRepository;
 	}
-	
+
 	public void checkCourseStatus(Optional<Course> course) throws ErrorItem {
 		if (!course.get().getStatus().equals(Status.BUILDING)) {
 			throw new ErrorItem("courseId", "Curso não está em construção");
@@ -56,7 +61,8 @@ public class TaskService {
 		}
 	}
 
-	public void checkNumberOfCorrectAndIncorrectAnswersMultipleChoice(NewTaskWithOptionsDTO newTaskDTO) throws ErrorItem {
+	public void checkNumberOfCorrectAndIncorrectAnswersMultipleChoice(NewTaskWithOptionsDTO newTaskDTO)
+			throws ErrorItem {
 		int numberOfCorrectAnswers = 0;
 		int numberOfIncorrectAnswers = 0;
 		for (NewOptionDTO option : newTaskDTO.getOptions()) {
@@ -79,28 +85,43 @@ public class TaskService {
 			}
 		}
 	}
-	
+
 	public void fixTaskOrder(Task taskToFix) throws ErrorItem {
 		List<Task> tasks = taskRepository.findAllByOrderByOrder();
-		if(tasks.isEmpty() && taskToFix.getOrder() != 1) {
+		if (tasks.isEmpty() && taskToFix.getOrder() != 1) {
 			throw new ErrorItem("order", "A sequência de atividades deve começar em 1");
 		}
-		if(tasks.isEmpty())
+		if (tasks.isEmpty())
 			return;
 		int orderToMove = 0;
-		if (tasks.getLast().getOrder()+1 == taskToFix.getOrder()) {
+		if (tasks.getLast().getOrder() + 1 == taskToFix.getOrder()) {
 			return;
-		} 
-		if (tasks.getLast().getOrder()+1 < taskToFix.getOrder()) {
+		}
+		if (tasks.getLast().getOrder() + 1 < taskToFix.getOrder()) {
 			throw new ErrorItem("order", "A sequência de atividades está incorreta");
 		}
 		if (tasks.getLast().getOrder() >= taskToFix.getOrder()) {
 			orderToMove = taskToFix.getOrder();
 		}
 		for (int i = orderToMove; i <= tasks.size(); i++) {
-			tasks.get(i-1).setOrder(i+1);
-			taskRepository.save(tasks.get(i-1));
+			tasks.get(i - 1).setOrder(i + 1);
+			taskRepository.save(tasks.get(i - 1));
 		}
+	}
+
+	public boolean checkHasDuplicateOption(List<NewOptionDTO> options) {
+		Set<String> elements = new HashSet<String>();
+		List<NewOptionDTO> duplicates = options.stream().filter(n -> !elements.add(n.getOption()))
+				.collect(Collectors.toList());
+		return duplicates.isEmpty();
+	}
+
+	public boolean checkHasDuplicateTaskStatement(NewTaskDTO newTaskDTO, Course course) {
+		ExampleMatcher matcher = ExampleMatcher.matching().withIgnoreCase()
+				.withIgnorePaths("id", "_order", "_type", "createdAt");
+		Example<Task> example = Example.of(newTaskDTO.toModel(course), matcher);
+		Optional<Task> task = taskRepository.findOne(example);
+		return task.isEmpty();
 	}
 
 }
