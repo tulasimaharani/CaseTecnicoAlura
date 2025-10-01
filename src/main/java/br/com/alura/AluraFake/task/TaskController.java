@@ -1,11 +1,8 @@
 package br.com.alura.AluraFake.task;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -19,7 +16,6 @@ import br.com.alura.AluraFake.course.Course;
 import br.com.alura.AluraFake.course.CourseRepository;
 import br.com.alura.AluraFake.util.ErrorItem;
 import br.com.alura.AluraFake.util.ErrorItemDTO;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 
 @RestController
@@ -49,11 +45,11 @@ public class TaskController {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 						.body(new ErrorItemDTO("courseId", "Curso inválido"));
 			}
-			taskService.checkCourseStatus(course);
+			taskService.checkCourseStatus(course.get());
 			
 			if(!taskService.checkHasDuplicateTaskStatement(newTaskDTO, course.get())) {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-						.body(new ErrorItemDTO("option", "O curso não pode ter duas atividades com o mesmo enunciado"));
+						.body(new ErrorItemDTO("statement", "O curso não pode ter duas atividades com o mesmo enunciado"));
 			}
 			
 			Task task = newTaskDTO.toModel(course.get());
@@ -87,11 +83,11 @@ public class TaskController {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 						.body(new ErrorItemDTO("courseId", "Curso inválido"));
 			}
-			taskService.checkCourseStatus(course);
+			taskService.checkCourseStatus(course.get());
 			
 			if(!taskService.checkHasDuplicateTaskStatement(newTaskWithOptionsDTO, course.get())) {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-						.body(new ErrorItemDTO("option", "O curso não pode ter duas atividades com o mesmo enunciado"));
+						.body(new ErrorItemDTO("statement", "O curso não pode ter duas atividades com o mesmo enunciado"));
 			}
 			
 			if(!taskService.checkHasDuplicateOption(newTaskWithOptionsDTO.getOptions())) {
@@ -135,11 +131,11 @@ public class TaskController {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 						.body(new ErrorItemDTO("courseId", "Curso inválido"));
 			}
-			taskService.checkCourseStatus(course);
+			taskService.checkCourseStatus(course.get());
 			
 			if(!taskService.checkHasDuplicateTaskStatement(newTaskWithOptionsDTO, course.get())) {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-						.body(new ErrorItemDTO("option", "O curso não pode ter duas atividades com o mesmo enunciado"));
+						.body(new ErrorItemDTO("statement", "O curso não pode ter duas atividades com o mesmo enunciado"));
 			}
 			
 			if(!taskService.checkHasDuplicateOption(newTaskWithOptionsDTO.getOptions())) {
