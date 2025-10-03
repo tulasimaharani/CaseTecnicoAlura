@@ -102,7 +102,7 @@ class TaskControllerTest {
 		newTaskDTO.setOrder(1);
 		Course course = mockCourse(newTaskDTO);
 		
-		doReturn(true).when(taskService).checkHasDuplicateTaskStatement(newTaskDTO, course);
+		doReturn(true).when(taskService).checkHasDuplicateTaskStatement(any(), any());
 		
 		mockMvc.perform(post("/task/new/opentext").contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(newTaskDTO))).andExpect(status().isCreated());
